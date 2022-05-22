@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+			 	Width="1000" Height="600"
+             x:Class="RaceDBGui.Views.DataBaseView"
+			 Background="White">
+	<Grid ColumnDefinitions="*" RowDefinitions="15*,*">
+		<Grid RowDefinitions="15*,*,*,*">
+			<Grid Grid.Row="0">
+				<DataGrid Name="Races_data"  CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" BorderBrush="Black" Items="{Binding $parent[Window].DataContext.Entities}" AutoGenerateColumns="True"></DataGrid>
+			</Grid>
+			<ComboBox Grid.Row="1" SelectedIndex="0" Items="{Binding $parent[Window].DataContext.TableNames}" SelectedItem="{Binding $parent[Window].DataContext.SelectedTable}">
+			</ComboBox>
+			<Button Grid.Row="2" Command="{Binding $parent[Window].DataContext.AddNewEntity}" Grid.Column="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+				Добавить элемент
+			</Button>
+			<Button Grid.Row="3" CommandParameter="{Binding  ElementName=Races_data, Path=SelectedIndex}" Command="{Binding $parent[Window].DataContext.RemoveSelectedEntity}"  Grid.Column="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+				Удалить выбранный элемент
+			</Button>
+		</Grid>
+		<Button Command="{Binding $parent[Window].DataContext.OpenRequestManager}" Grid.Column="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+			Менеджер запросов
+		</Button>
+	</Grid>
+</UserControl>
