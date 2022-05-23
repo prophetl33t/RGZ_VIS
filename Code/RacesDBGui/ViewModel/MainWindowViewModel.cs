@@ -41,8 +41,7 @@ namespace RaceDBGui.ViewModels
         private string? _selectedTable;
         private ObservableCollection<Object> _entities;
         private ViewModelBase _content;
-        private Request _request;
-        
+
         public string? SelectedTable
         {
             get => _selectedTable;
@@ -81,12 +80,6 @@ namespace RaceDBGui.ViewModels
         {
             get => _content;
             set => this.RaiseAndSetIfChanged(ref _content, value);
-        }
-        
-        public Request SelectedRequest
-        {
-            get => _request;
-            set => this.RaiseAndSetIfChanged(ref _request,value);
         }
 
         public MainWindowViewModel()
