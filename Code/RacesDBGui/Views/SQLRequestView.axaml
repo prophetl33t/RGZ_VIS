@@ -8,10 +8,33 @@
 
 	<Grid  RowDefinitions="18*,*,*,*" ColumnDefinitions="*">
 					<ScrollViewer   Grid.Column="0" Grid.Row="0" VerticalScrollBarVisibility="Auto">
-						<ItemsControl  Items="{Binding $parent[Window].DataContext.Requests}">
+						<ItemsControl Items="{Binding $parent[Window].DataContext.Requests}">
 							<ItemsControl.ItemTemplate>
 								<DataTemplate>
 							      <Expander Header="{Binding Name}">
+								      <StackPanel>
+									      <Grid  RowDefinitions="*" ColumnDefinitions="0.2*,*,*">
+										      <Label>Table name</Label>
+										      <TextBox Grid.Column="1" Text="{Binding TableName}"></TextBox>
+										      <CheckBox Grid.Column="2"> DELETE request</CheckBox>
+									      </Grid>
+									      <Grid  RowDefinitions="*" ColumnDefinitions="0.2*,*,*">
+										      <Label>Join</Label>
+										      <ComboBox Grid.Column="1" Items="{Binding JoinFields.Key}"></ComboBox>
+										      <ComboBox Grid.Column="2" Items="{Binding JoinFields.Value}"></ComboBox>
+									      </Grid>
+									      <Grid  RowDefinitions="*" ColumnDefinitions="0.2*,*">
+										      <Label>Where</Label>
+										      <TextBox Grid.Column="3" Text="{Binding  WhereCondition}"></TextBox>
+									      </Grid>
+									      <Grid  RowDefinitions="*" ColumnDefinitions="*,*">
+										      <Label>Group</Label>
+										      <TextBox Grid.Column="3" Text="{Binding  GroupField}"></TextBox>
+									      </Grid>
+									      <Button CommandParameter="{Binding}" Command="{Binding $parent[Window].DataContext.ExecuteSQLQuery}" Grid.Column="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.ColumnSpan="2" Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+										      Запустить запрос
+									      </Button>
+								      </StackPanel>
 							      </Expander>
 							  </DataTemplate>
 						 </ItemsControl.ItemTemplate>
@@ -19,10 +42,6 @@
 					</ScrollViewer>
 		<Button Command="{Binding $parent[Window].DataContext.CreateRequest}" Grid.Column="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.ColumnSpan="2" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 			Создать запрос
-		</Button>
-		
-		<Button Command="{Binding $parent[Window].DataContext.ExecuteSQLQuery}" Grid.Column="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.ColumnSpan="2" Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-			Запустить запрос
 		</Button>
 		
 	</Grid>

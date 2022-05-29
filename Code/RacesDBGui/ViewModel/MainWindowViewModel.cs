@@ -2,6 +2,7 @@ using Avalonia.Media;
 using Avalonia;
 using ReactiveUI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,6 +13,10 @@ using System.Xml.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using System.Collections.Specialized;
+using System.Data;
+using System.Data.Common;
+using System.Dynamic;
+using System.Globalization;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
 using Avalonia.Controls;
@@ -35,8 +40,9 @@ namespace RaceDBGui.ViewModels
 
     public class MainWindowViewModel : ViewModelBase
     {
-        
+        public const string dbModel = "RacesDBGui.Model.";
         private List<string> _tableNames;
+        private List<string> _fieldsNames;
         private ObservableCollection<Request> _requests;
         private string? _selectedTable;
         private ObservableCollection<Object> _entities;
@@ -53,7 +59,7 @@ namespace RaceDBGui.ViewModels
                     if (_selectedTable == null)
                         return;
                     Entities = new ObservableCollection<Object>(db
-                        .Query("RacesDBGui.Model." + _selectedTable).ToDynamicList());
+                        .Query(dbModel + _selectedTable).ToDynamicList());
                 }
             }
         }
@@ -70,6 +76,12 @@ namespace RaceDBGui.ViewModels
             set => this.RaiseAndSetIfChanged(ref _tableNames, value);
         }
         
+        public List<string> FieldsNames
+        {
+            get => _fieldsNames;
+            set => this.RaiseAndSetIfChanged(ref _fieldsNames, value);
+        }
+
         public ObservableCollection<Request> Requests
         {
             get => _requests;
@@ -101,9 +113,12 @@ namespace RaceDBGui.ViewModels
             };
         }
 
-        public void AddNewEntity()
-        {         
-            Type t = Type.GetType("RacesDBGui.Model." + _selectedTable); 
+        public void AddNewEntity(string name = "")
+        {       
+            if (name == null)
+                name = _selectedTable;
+            
+            Type t = Type.GetType(dbModel + name); 
             Entities.Add(Activator.CreateInstance(t));         
         }
         public void RemoveSelectedEntity(int SelectedEntity)
@@ -121,9 +136,66 @@ namespace RaceDBGui.ViewModels
         }
 
         public void OpenRequestManager() => Content = new SQLRequestViewModel();
-        public void ExecuteSQLQuery()
+        
+        public static string CapitalizeFirstLetter(string s)
         {
+            if (String.IsNullOrEmpty(s))
+                return s;
+            if (s.Length == 1)
+                return s.ToUpper();
+            return s.Remove(1).ToUpper() + s.Substring(1);
+        }
+        
+        public static Object ToObject(IDictionary<string, Object> source, string className)
+        {
+            Type t = Type.GetType(dbModel + className); 
+            var someObject = Activator.CreateInstance(t);
+
+            foreach (var item in source)
+            {
+                t.GetProperty(item.Key).SetValue(someObject, item.Value);
+            }
+
+            return someObject;
+        }
+        public static List<Dictionary<string, Object>> DynamicListFromSql(race_dbContext db, string Sql)
+        {
+            List<Dictionary<string, Object>> data = new List<Dictionary<string, object>>();
+            using (var cmd = db.Database.GetDbConnection().CreateCommand())
+            {
+                cmd.CommandText = Sql;
+                if (cmd.Connection.State != ConnectionState.Open) { cmd.Connection.Open(); }
+
+                using (var dataReader = cmd.ExecuteReader())
+                {
+                    while (dataReader.Read())
+                    {
+                        var row = new Dictionary<string, Object>();
+                        for (var fieldCount = 0; fieldCount < dataReader.FieldCount; fieldCount++)
+                        {
+                            row.Add(CapitalizeFirstLetter(dataReader.GetName(fieldCount)), dataReader[fieldCount]);
+                        }
+                        data.Add(row);
+                    }
+                }
+            }
+
+            return data;
+        }
+        public void ExecuteSQLQuery(Request r)
+        {
+            if (Entities.Count != 0)
+            Entities.Clear();
+            
             Content = new DataBaseViewModel();
+            using (var db = new race_dbContext())
+            {
+                foreach (var dict in DynamicListFromSql(db, $"SELECT * FROM {r.TableName} WHERE {r.WhereCondition}"))
+                {
+                    Entities.Add(ToObject(dict, r.TableName));
+                }
+            }
+
         }
     }
 }

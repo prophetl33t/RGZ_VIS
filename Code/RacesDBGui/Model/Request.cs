@@ -18,11 +18,61 @@ namespace RacesDBGui.Model
                 _name = value;
                 RaisePropertyChangedEvent("Name");
             }
-        }    
-        public string TableName { get; set; }
-        public List<string> Fields { get; set; }
-        public string Operation { get; set; }
-        public string? Subrequest { get; set; }
+        }
+
+        private string _tableName;
+        
+        public string TableName
+        { 
+            get => _tableName; 
+            set
+            {
+                _tableName = value;
+                RaisePropertyChangedEvent("TableName");
+            }
+        }
+        private  KeyValuePair<string, string> _joinFields;
+        public  KeyValuePair<string, string> JoinFields
+        { 
+            get => _joinFields; 
+            set
+            {
+                _joinFields = value;
+                RaisePropertyChangedEvent("JoinFields");
+            }
+        }
+
+        private  KeyValuePair<string, string> _whereFields;
+        KeyValuePair<string, string> WhereFields
+        { 
+            get => _whereFields; 
+            set
+            {
+                _whereFields = value;
+                RaisePropertyChangedEvent("WhereFields");
+            }
+        }
+
+        private string _whereCondition;
+        public string WhereCondition
+        { 
+            get => _whereCondition; 
+            set
+            {
+                _whereCondition = value;
+                RaisePropertyChangedEvent("WhereCondition");
+            }
+        }
+        private  string _groupField;
+        public string GroupField
+        { 
+            get => _groupField; 
+            set
+            {
+                _groupField = value;
+                RaisePropertyChangedEvent("GroupField");
+            }
+        }
         public Request(string name)
         {
             Name = name;
